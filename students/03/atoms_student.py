@@ -232,7 +232,7 @@ def _(SIZE_X, SIZE_Y, add_atom_btn, add_falldown_btn, atom_count_dropdown, get_w
     circles_svg = "\n".join(svg_elements)
 
     canvas = mo.Html(f"""
-    <svg width="{SIZE_X}" height="{SIZE_Y}" style="background-color: black; border-radius: 8px; border: 2px solid #00A499;">
+    <svg width="{SIZE_X}" height="{SIZE_Y}" style="background-color: white; border-radius: 8px; border: 2px solid #00A499;">
         {circles_svg}
     </svg>
     """)
