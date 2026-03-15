@@ -1,6 +1,6 @@
 import marimo
 
-__generated_with = "0.13.0"
+__generated_with = "0.18.0"
 app = marimo.App(width="medium")
 
 
@@ -38,118 +38,8 @@ def _(mo):
 @app.cell
 def _():
     import random
-    return (random,)
-
-
-@app.cell
-def _():
-    class Atom:
-
-        def __init__(self, pos: tuple[int, int], vel: tuple[int, int], rad: int, col: str):
-            """
-            Initializer of Atom class
-
-            :param pos: tuple (x, y) position
-            :param vel: tuple (vx, vy) velocity
-            :param rad: radius
-            :param col: color of displayed circle
-            """
-            pass
-
-        def to_tuple(self) -> tuple[int, int, int, str]:
-            """
-            Returns tuple representing an atom.
-
-            Example: pos = (10, 12), rad = 15, color = 'green' -> (10, 12, 15, 'green')
-            """
-            pass
-
-        def apply_speed(self, size_x: int, size_y: int):
-            """
-            Applies velocity `vel` to atom's position `pos`.
-            Check boundary collisions and reverse direction when hitting edges.
-            Clamp the position back to the boundary to prevent the atom from escaping.
-
-            :param size_x: width of the world space
-            :param size_y: height of the world space
-            """
-            pass
-
-    return (Atom,)
-
-
-@app.cell
-def _(Atom):
-    class FallDownAtom(Atom):
-        """
-        Class to represent atoms that are pulled by gravity.
-
-        Set gravity factor g to ~3.0
-        Set damping factor to ~0.7
-
-        Override apply_speed to:
-        - Add g to vertical velocity each tick
-        - On hitting the ground (bottom edge), clamp position and damp both vx and vy by multiplying with damping
-        - Clamp position on all boundary hits to prevent atoms from escaping
-        """
-
-        g = 3.0
-        damping = 0.7
-
-        pass
-
-    return (FallDownAtom,)
-
-
-@app.cell
-def _(Atom, FallDownAtom, random):
-    class ExampleWorld:
-
-        def __init__(self, size_x: int, size_y: int, no_atoms: int, no_falldown_atoms: int):
-            self.width = size_x
-            self.height = size_y
-            self.atoms: list[Atom | FallDownAtom] = []
-            # TODO: call generate_atoms here
-
-        def generate_atoms(self, no_atoms: int, no_falldown_atoms: int) -> list[Atom | FallDownAtom]:
-            """
-            Generates no_atoms Atom instances and no_falldown_atoms FallDownAtom instances.
-            Returns list of all atom instances.
-            """
-            pass
-
-        def random_atom(self) -> Atom:
-            """
-            Generates one Atom at random position with random velocity, random radius, green color.
-            """
-            pass
-
-        def random_falldown_atom(self) -> FallDownAtom:
-            """
-            Generates one FallDownAtom at random position with random velocity, random radius, yellow color.
-            """
-            pass
-
-        def add_atom(self, pos_x: int, pos_y: int):
-            """
-            Adds a new Atom at the given position with random velocity and radius.
-            """
-            pass
-
-        def add_falldown_atom(self, pos_x: int, pos_y: int):
-            """
-            Adds a new FallDownAtom at the given position with random velocity and radius.
-            """
-            pass
-
-        def tick(self) -> list[tuple[int, int, int, str]]:
-            """
-            Moves all atoms and returns list of tuples for rendering.
-            """
-            # TODO: call apply_speed on each atom and return list of to_tuple results
-            return [(120, 60, 15, "#43B02A"), (240, 300, 10, "#FFB81C")]
-
-    return (ExampleWorld,)
+    from atoms import Atom, FallDownAtom, ExampleWorld
+    return Atom, ExampleWorld, FallDownAtom, random
 
 
 @app.cell
@@ -162,7 +52,7 @@ def _():
 
 
 @app.cell
-def _(ExampleWorld, NO_ATOMS, NO_FALLDOWN_ATOMS, SIZE_X, SIZE_Y, mo):
+def _(ExampleWorld, NO_ATOMS, NO_FALLDOWN_ATOMS, SIZE_X, SIZE_Y, mo, random):
     # Create world instance (stored in mo.state so buttons can mutate it)
     get_world, set_world = mo.state(
         ExampleWorld(SIZE_X, SIZE_Y, NO_ATOMS, NO_FALLDOWN_ATOMS)
@@ -232,8 +122,11 @@ def _(SIZE_X, SIZE_Y, add_atom_btn, add_falldown_btn, atom_count_dropdown, get_w
     circles_svg = "\n".join(svg_elements)
 
     canvas = mo.Html(f"""
-    <svg width="{SIZE_X}" height="{SIZE_Y}" style="background-color: white; border-radius: 8px; border: 2px solid #00A499;">
-        {circles_svg}
+    <svg width="{SIZE_X + 4}" height="{SIZE_Y + 4}" style="border-radius: 8px;">
+        <rect x="0" y="0" width="{SIZE_X + 4}" height="{SIZE_Y + 4}" rx="8" fill="white" stroke="#00A499" stroke-width="4"/>
+        <g transform="translate(2, 2)">
+            {circles_svg}
+        </g>
     </svg>
     """)
 
